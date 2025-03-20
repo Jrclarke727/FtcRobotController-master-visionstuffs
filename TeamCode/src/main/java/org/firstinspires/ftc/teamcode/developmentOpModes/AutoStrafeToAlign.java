@@ -1,19 +1,29 @@
 package org.firstinspires.ftc.teamcode.developmentOpModes;
 
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.teamcode.vision.RotatedBoxesYellow;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.vision.RotatedBoxesYellow;
 
-@Autonomous(name = "RotatedBoxesYellowOpMode")
-public class RotatedBoxesYellowOpMode extends LinearOpMode {
+@Config
+@Autonomous(name = "AutoStrafeToAlign")
+public class AutoStrafeToAlign extends LinearOpMode {
 
-    private OpenCvCamera camera;
-    private RotatedBoxesYellow pipeline;
+    private OpenCvWebcam camera;
+    private RotatedBoxesYellow pipeline = new RotatedBoxesYellow();
+
+    public static double STRAFE_POWER = 0.1; // Adjustable in FTC Dashboard
+    public static double PIXELS_TO_INCHES = 0.03; // Adjustable in FTC Dashboard
+    public static int TOLERANCE = 8; // Adjustable in FTC Dashboard
 
     @Override
     public void runOpMode() {
@@ -38,39 +48,34 @@ public class RotatedBoxesYellowOpMode extends LinearOpMode {
             }
 
             @Override
-            public void onError (int errorCode) {
+            public void onError(int errorCode) {
                 telemetry.addData("Camera Error", "Error code: " + errorCode);
                 telemetry.update();
             }
         });
 
-        telemetry.addLine("Waiting for start");
-        telemetry.update();
+        // Initialize Road Runner drive
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         waitForStart();
 
-        try {
-            while (opModeIsActive()) {
-                // Display data from the pipeline to the telemetry
-                telemetry.addData("Center X", pipeline.cX);
-                telemetry.addData("Center Y", pipeline.cY);
-                telemetry.addData("Width", pipeline.width);
-                telemetry.update();
-
-                // Allow OpenCV processing to continue
-                sleep(50);
+        while (opModeIsActive()) {
+            int xOffset = 0;
+            if (!pipeline.rectangleCenters.isEmpty() && pipeline.rectangleCenters.get(0) != null) {
+                xOffset = (int) (pipeline.rectangleCenters.get(0).x - RotatedBoxesYellow.xTarget);
             }
-        } finally {
-            // Ensure the camera is stopped properly when the OpMode ends
-            if (camera != null) {
-                telemetry.addLine("Stopping camera...");
-                telemetry.update();
 
-                camera.stopStreaming();
-                camera.closeCameraDevice();
+            telemetry.addData("xOffset", xOffset);
+            telemetry.addData("STRAFE_POWER", STRAFE_POWER);
+            telemetry.addData("PIXELS_TO_INCHES", PIXELS_TO_INCHES);
+            telemetry.addData("TOLERANCE", TOLERANCE);
+            telemetry.update();
 
-                telemetry.addLine("Camera stopped successfully.");
-                telemetry.update();
+            if (Math.abs(xOffset) > TOLERANCE) {
+                double strafeDistance = xOffset * PIXELS_TO_INCHES;
+                drive.followTrajectory(drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .strafeRight(strafeDistance)
+                        .build());
             }
         }
     }

@@ -31,8 +31,8 @@ public class OpenCVTest extends LinearOpMode {
     double width = 0;
 
     private OpenCvCamera controlHubCam;  // Use OpenCvCamera class from FTC SDK
-    private static final int CAMERA_WIDTH = 640; // width  of wanted camera resolution
-    private static final int CAMERA_HEIGHT = 480; // height of wanted camera resolution
+    private static final int CAMERA_WIDTH = 480; // width  of wanted camera resolution
+    private static final int CAMERA_HEIGHT = 640; // height of wanted camera resolution
 
     // Calculate the distance using the formula
     public static final double objectWidthInRealWorldUnits = 3.75;  // Replace with the actual width of the object in real-world units
@@ -75,7 +75,7 @@ public class OpenCVTest extends LinearOpMode {
         controlHubCam.setPipeline(new YellowBlobDetectionPipeline());
 
         controlHubCam.openCameraDevice();
-        controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+        controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.SIDEWAYS_LEFT);
     }
     class YellowBlobDetectionPipeline extends OpenCvPipeline {
         @Override
