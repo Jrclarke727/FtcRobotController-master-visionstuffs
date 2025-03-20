@@ -26,9 +26,9 @@ public class AutoStrafeToAlign3 extends LinearOpMode {
     private Servo pivot = null;
     private static final double pivot_NEUTRAL = 0.5;
     public static double MAX_STRAFE_POWER = 0.5; // Adjustable in FTC Dashboard
-    public static double MIN_STRAFE_POWER = 0.1; // Minimum power to ensure movement
+    public static double MIN_STRAFE_POWER = 0.2; // Minimum power to ensure movement
     public static double PIXELS_TO_INCHES = 0.03; // Adjustable in FTC Dashboard
-    public static int TOLERANCE = 25; // Adjustable in FTC Dashboard
+    public static int TOLERANCE = 30; // Adjustable in FTC Dashboard
 
     // Roll range constants
     private final double ROLL_MIN = 0;
