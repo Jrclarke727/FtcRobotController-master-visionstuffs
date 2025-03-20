@@ -28,7 +28,7 @@ public class AutoStrafeToAlign3 extends LinearOpMode {
     public static double MAX_STRAFE_POWER = 0.5; // Adjustable in FTC Dashboard
     public static double MIN_STRAFE_POWER = 0.1; // Minimum power to ensure movement
     public static double PIXELS_TO_INCHES = 0.03; // Adjustable in FTC Dashboard
-    public static int TOLERANCE = 8; // Adjustable in FTC Dashboard
+    public static int TOLERANCE = 25; // Adjustable in FTC Dashboard
 
     // Roll range constants
     private final double ROLL_MIN = 0;
@@ -53,7 +53,7 @@ public class AutoStrafeToAlign3 extends LinearOpMode {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
+                camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT, OpenCvWebcam.StreamFormat.MJPEG);
                 dashboard.startCameraStream(camera, 60); // Stream to FTC Dashboard
             }
 
@@ -77,12 +77,13 @@ public class AutoStrafeToAlign3 extends LinearOpMode {
                 if (!pipeline.contoursByArea2f.empty()) {
                     RotatedRect rect = Imgproc.minAreaRect(pipeline.contoursByArea2f);
                     angle = rect.angle;
-                }
+                } else {angle = 90}
             }
 
             // Map angle (-90 to 90) to servo position (0 to 1)
-            double pivotPosition = angle;
-            pivotPosition = Math.max(ROLL_MIN, Math.min(ROLL_MAX, pivotPosition)); // Clamp to valid range
+            private double pivotPosition(double angle){
+                return (angle+90) / 180.0 * ( ROLL_MAX - ROLL_MIN) + ROLL_MIN - 0.5;
+            }
             pivot.setPosition(pivotPosition);
 
             telemetry.addData("xOffset", xOffset);

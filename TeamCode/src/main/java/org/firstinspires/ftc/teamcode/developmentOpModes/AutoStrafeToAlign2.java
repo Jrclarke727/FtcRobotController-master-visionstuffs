@@ -54,7 +54,7 @@ public class AutoStrafeToAlign2 extends LinearOpMode {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
+                camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT OpenCvWebcam.StreamFormat.MJPEG);
                 dashboard.startCameraStream(camera, 60); // Stream to FTC Dashboard
             }
 
